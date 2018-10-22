@@ -1,0 +1,26 @@
+{
+  "name": "ajax-sender",
+  "version": "0.1.0",
+  "description": "Send AJAX requests easily",
+  "main": "AjaxSender.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zenoo/ajax-sender.git"
+  },
+  "keywords": [
+    "ajax",
+    "request",
+    "send",
+    "upload",
+    "progress"
+  ],
+  "author": "Zenoo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Zenoo/ajax-sender/issues"
+  },
+  "homepage": "https://github.com/Zenoo/ajax-sender#readme"
+}
