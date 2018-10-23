@@ -20,7 +20,15 @@ let ajax = new AjaxSender('https://your.url', options);
 
 ```
 {
-
+	method: 'GET',
+	data: { ... },
+	responseType: 'json',
+	headers: { ... },
+	progress: response => { ... },
+	load: response => { ... },
+	error: response => { ... },
+	uploadProgress: response => { ... },
+	uploadLoad: response => { ... }
 }
 ```
 * **Methods**
