@@ -1,6 +1,13 @@
 /* exported AjaxSender */
 
 /**
+ * Callback function used for the XHR events
+ *
+ * @callback eventCallback
+ * @param {Object} response The XHR response
+ */
+
+/**
  * AjaxSender Class used to handle ajax calls
  */
 class AjaxSender{
@@ -12,11 +19,11 @@ class AjaxSender{
      * @param {Object|FormData}			[parameters.data]				Request data
      * @param {String}					[parameters.responseType=json]	Request response type
      * @param {Object.<String, String>}	[parameters.headers]			Request headers
-     * @param {Function}				[parameters.progress]			Callback for the progress event
-     * @param {Function}				[parameters.load]				Callback for the load event
-     * @param {Function}				[parameters.error]				Callback for the error event
-     * @param {Function}				[parameters.uploadProgress]		Callback for the upload progress event
-     * @param {Function}				[parameters.uploadLoad]			Callback for the upload progress event
+     * @param {eventCallback}			[parameters.progress]			Callback for the progress event
+     * @param {eventCallback}			[parameters.load]				Callback for the load event
+     * @param {eventCallback}			[parameters.error]				Callback for the error event
+     * @param {eventCallback}			[parameters.uploadProgress]		Callback for the upload progress event
+     * @param {eventCallback}			[parameters.uploadLoad]			Callback for the upload progress event
      */
 	constructor(url, parameters){
 		/**
