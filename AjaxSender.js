@@ -42,13 +42,21 @@ class AjaxSender{
 		}
 		if(parameters.load){
 			this.xhr.addEventListener('load', () => {
-				Reflect.apply(parameters.load, null, [this.xhr.response]);
+				if(this.xhr.status == 200){
+					Reflect.apply(parameters.load, null, [this.xhr.response]);
+				}else{
+					if(parameters.error){
+						Reflect.apply(parameters.error, null, [this.xhr]);
+					}else{
+						console.log(this.xhr);
+					}
+				}
 			});
 		}
 		this.xhr.addEventListener('error', parameters.error ? () => {
-			Reflect.apply(parameters.error, null, [this.xhr.response]);
-		} : e => {
-			console.log(e);
+			Reflect.apply(parameters.error, null, [this.xhr]);
+		} : () => {
+			console.log(this.xhr);
 		});
 
 		/**
@@ -65,9 +73,9 @@ class AjaxSender{
 			});
 		}
 		this.xhr.upload.addEventListener('error', parameters.error ? () => {
-			Reflect.apply(parameters.error, null, [this.xhr.response]);
-		} : e => {
-			console.log(e);
+			Reflect.apply(parameters.error, null, [this.xhr]);
+		} : () => {
+			console.log(this.xhr);
 		});
 
 		/**
