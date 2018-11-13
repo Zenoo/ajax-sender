@@ -60,29 +60,84 @@ class AjaxSender{
 		 */
 		this.xhr = new XMLHttpRequest();
 
+		// Default values
+		this._parameters = {
+			method: parameters.method || 'GET',
+			data: parameters.data || {},
+			responseType: parameters.responseType || 'json',
+			headers: parameters.headers || {},
+			progress: parameters.progress,
+			load: parameters.load,
+			error: parameters.error,
+			uploadProgress: parameters.uploadProgress,
+			uploadLoad: parameters.uploadLoad
+		};
+
+		this._handleCallbacks();
+
+		/**
+		 * Request method
+		 */
+		if(this._parameters.method == 'GET'){
+			this.xhr.open('GET', url + '?' + this._objectToURL(this._parameters.data));
+		}else{
+			this.xhr.open(this._parameters.method, url);
+		}
+
+		/**
+		 * Request headers
+		 */
+		Object.entries(this._parameters.headers).forEach(([header, value]) => this.xhr.setRequestHeader(header, value));
+
+		/**
+		 * Data handling
+		 */
+		if(this._parameters.method == 'GET'){
+			this.xhr.send();
+		}else{
+			if(this._parameters.data instanceof FormData){
+				this._parameters.data.processData = false;
+				this._parameters.data.contentType = false;
+				this.xhr.send(this._parameters.data);
+			}else{
+				const formData = new FormData();
+	
+				formData.processData = false;
+				formData.contentType = false;
+				Object.keys(this._parameters.data).forEach(key => formData.append(key, typeof this._parameters.data[key] == 'object' ? JSON.stringify(this._parameters.data[key]) : this._parameters.data[key]));
+				this.xhr.send(formData);
+			}
+		}
+	}
+
+	/**
+	 * Handle callback attachment
+	 * @private
+	 */
+	_handleCallbacks(){
 		/**
 		 * DOWNLOAD CALLBACKS
 		 */
-		if(parameters.progress){
+		if(this._parameters.progress){
 			this.xhr.addEventListener('progress', () => {
-				Reflect.apply(parameters.progress, null, [this.xhr.response]);
+				Reflect.apply(this._parameters.progress, null, [this.xhr.response]);
 			});
 		}
-		if(parameters.load){
+		if(this._parameters.load){
 			this.xhr.addEventListener('load', () => {
 				if(this.xhr.status == 200){
-					Reflect.apply(parameters.load, null, [this.xhr.response]);
+					Reflect.apply(this._parameters.load, null, [this.xhr.response]);
 				}else{
-					if(parameters.error){
-						Reflect.apply(parameters.error, null, [this.xhr]);
+					if(this._parameters.error){
+						Reflect.apply(this._parameters.error, null, [this.xhr]);
 					}else{
 						console.log(this.xhr);
 					}
 				}
 			});
 		}
-		this.xhr.addEventListener('error', parameters.error ? () => {
-			Reflect.apply(parameters.error, null, [this.xhr]);
+		this.xhr.addEventListener('error', this._parameters.error ? () => {
+			Reflect.apply(this._parameters.error, null, [this.xhr]);
 		} : () => {
 			console.log(this.xhr);
 		});
@@ -90,52 +145,42 @@ class AjaxSender{
 		/**
 		 * UPLOAD CALLBACKS
 		 */
-		if(parameters.uploadProgress){
+		if(this._parameters.uploadProgress){
 			this.xhr.upload.addEventListener('progress', () => {
-				Reflect.apply(parameters.uploadProgress, null, [this.xhr.response]);
+				Reflect.apply(this._parameters.uploadProgress, null, [this.xhr.response]);
 			});
 		}
-		if(parameters.uploadLoad){
+		if(this._parameters.uploadLoad){
 			this.xhr.upload.addEventListener('load', () => {
-				Reflect.apply(parameters.uploadLoad, null, [this.xhr.response]);
+				Reflect.apply(this._parameters.uploadLoad, null, [this.xhr.response]);
 			});
 		}
-		this.xhr.upload.addEventListener('error', parameters.error ? () => {
-			Reflect.apply(parameters.error, null, [this.xhr]);
+		this.xhr.upload.addEventListener('error', this._parameters.error ? () => {
+			Reflect.apply(this._parameters.error, null, [this.xhr]);
 		} : () => {
 			console.log(this.xhr);
 		});
+	}
 
-		/**
-		 * Response type
-		 */
-		this.xhr.responseType = parameters.responseType || 'json';
+	/**
+	 * Encode an object for an URL use
+	 * @param {Object} object Object to transform
+	 * @param {String} prefix Parameter needed for the recursion
+	 * @private
+	 */
+	_objectToURL(object, prefix){
+		const str = [];
 
-		/**
-		 * Request method
-		 */
-		this.xhr.open(parameters.method ? parameters.method : 'GET', url);
+		for (const p in object) {
+			if (Reflect.ownKeys(object).includes(p)) {
+			const 	k = prefix ? prefix + '[' + p + ']' : p,
+					v = object[p];
 
-		/**
-		 * Request headers
-		 */
-		Object.entries(parameters.headers || {}).forEach(([header, value]) => this.xhr.setRequestHeader(header, value));
-
-		/**
-		 * Data handling
-		 */
-		if(parameters.data instanceof FormData){
-			parameters.data.processData = false;
-			parameters.data.contentType = false;
-			this.xhr.send(parameters.data);
-		}else{
-			const formData = new FormData();
-
-			formData.processData = false;
-			formData.contentType = false;
-			Object.keys(parameters.data || {}).forEach(key => formData.append(key, typeof parameters.data[key] == 'object' ? JSON.stringify(parameters.data[key]) : parameters.data[key]));
-			this.xhr.send(formData);
+				str.push(v !== null &amp;&amp; typeof v === 'object' ? this._objectToURL(v, k) : encodeURIComponent(k) + '=' + encodeURIComponent(v));
+			}
 		}
+
+		return str.join('&amp;');
 	}
 
 	/**
@@ -163,7 +208,7 @@ class AjaxSender{
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Oct 24 2018 15:01:13 GMT+0200 (Romance Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Nov 13 2018 14:00:32 GMT+0100 (Romance Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
