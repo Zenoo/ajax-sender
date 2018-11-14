@@ -78,10 +78,6 @@ class AjaxSender{
 				formData.contentType = false;
 				this._objectToFlat(formData, this._parameters.data);
 
-				for (let pair of formData.entries()) {
-					console.log(pair[0]+ ': ' + pair[1]); 
-				}
-
 				this.xhr.send(formData);
 			}
 		}
