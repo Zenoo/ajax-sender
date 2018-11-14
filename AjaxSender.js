@@ -76,7 +76,12 @@ class AjaxSender{
 	
 				formData.processData = false;
 				formData.contentType = false;
-				Object.keys(this._parameters.data).forEach(key => formData.append(key, typeof this._parameters.data[key] == 'object' ? JSON.stringify(this._parameters.data[key]) : this._parameters.data[key]));
+				Object.keys(this._parameters.data).forEach(key => {
+					const data = typeof this._parameters.data[key] == 'object' ? JSON.stringify(this._parameters.data[key]) : this._parameters.data[key];
+
+					console.log(data);
+					formData.append(key, data);
+				});
 				this.xhr.send(formData);
 			}
 		}
