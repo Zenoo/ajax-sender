@@ -76,12 +76,7 @@ class AjaxSender{
 	
 				formData.processData = false;
 				formData.contentType = false;
-				Object.keys(this._parameters.data).forEach(key => {
-					const data = typeof this._parameters.data[key] == 'object' ? JSON.stringify(this._parameters.data[key]) : this._parameters.data[key];
-
-					console.log(data);
-					formData.append(key, data);
-				});
+				this._objectToFlat(formData, this._parameters.data);
 				this.xhr.send(formData);
 			}
 		}
@@ -158,6 +153,25 @@ class AjaxSender{
 		}
 
 		return str.join('&');
+	}
+
+	/**
+	 * Encode an object for a FormData use
+	 * @param {FormData} formData The FormData
+	 * @param {Object} data The data to transform
+	 * @param {String} parentKey The parent key
+	 * @private
+	 */
+	_objectToFlat(formData, data, parentKey){
+		if (data && typeof data === 'object' && !(data instanceof Date) && !(data instanceof File)) {
+			Object.keys(data).forEach(key => {
+				this._objectToFlat(formData, data[key], parentKey ? `${parentKey}[${key}]` : key);
+			});
+		} else {
+			const value = data === null ? '' : data;
+		
+			formData.append(parentKey, value);
+		}
 	}
 
 	/**
