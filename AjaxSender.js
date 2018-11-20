@@ -48,6 +48,11 @@ class AjaxSender{
 		this._handleCallbacks();
 
 		/**
+		 * Response type
+		 */
+		this.xhr.responseType = this._parameters.responseType;
+
+		/**
 		 * Request method
 		 */
 		if(this._parameters.method == 'GET'){
