@@ -78,7 +78,7 @@ class AjaxSender{
 				formData.contentType = false;
 				this._objectToFlat(formData, this._parameters.data);
 
-				this.xhr.send(formData);
+				this.xhr.send(JSON.stringify(this._parameters.data));
 			}
 		}
 	}
