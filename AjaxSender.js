@@ -56,7 +56,10 @@ class AjaxSender{
 		 * Request method
 		 */
 		if(this._parameters.method == 'GET'){
-			this.xhr.open('GET', url + '?' + this._objectToURL(this._parameters.data));
+			const urlObject = new URL(url);
+
+			urlObject.search += (urlObject.search.length && Object.keys(this._parameters.data).length ? '&' : '') + this._objectToURL(this._parameters.data);
+			this.xhr.open('GET', urlObject.href);
 		}else{
 			this.xhr.open(this._parameters.method, url);
 		}
