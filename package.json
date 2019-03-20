@@ -1,6 +1,6 @@
 {
   "name": "ajax-sender",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "Send AJAX requests easily",
   "main": "AjaxSender.js",
   "types": "AjaxSender.d.ts",
