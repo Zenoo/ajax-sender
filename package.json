@@ -3,7 +3,7 @@
   "version": "0.1.10",
   "description": "Send AJAX requests easily",
   "main": "AjaxSender.js",
-  "typings": "AjaxSender.d.ts",
+  "types": "AjaxSender.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "preversion": "jsdoc . -R README.md -c docs/jsdoc-conf.json && git add * || true"
