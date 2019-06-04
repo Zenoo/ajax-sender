@@ -1,7 +1,7 @@
 {
     "source": {
         "includePattern": ".+\\.js$",
-		"excludePattern": "(.+\\.min\\.js$)",
+		"excludePattern": ".+\\.min\\.js$",
 		"exclude": [
 			"node_modules"
 		]
