@@ -25,7 +25,6 @@ const path = require('path');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
-	mode: 'production',
 	entry: './AjaxSender.js',
 	module: {
 		rules: [
