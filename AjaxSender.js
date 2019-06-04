@@ -1,9 +1,11 @@
 
 /* exported AjaxSender */
 
+/*eslint-disable */
 if (typeof window === 'undefined') {
 	XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
 }
+/*eslint-enable */
 
 /**
  * Callback function used for the XHR events
@@ -175,4 +177,5 @@ class AjaxSender {
 	}
 }
 
+// eslint-disable-next-line no-undef
 if (typeof window === 'undefined') module.exports = AjaxSender;
