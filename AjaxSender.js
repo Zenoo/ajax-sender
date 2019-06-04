@@ -1,4 +1,9 @@
+
 /* exported AjaxSender */
+
+if (typeof window === 'undefined') {
+	XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
+}
 
 /**
  * Callback function used for the XHR events
@@ -10,22 +15,22 @@
 /**
  * AjaxSender Class used to handle ajax calls
  */
-class AjaxSender{
+class AjaxSender {
 	/**
-     * Creates an instance of AjaxSender
+	 * Creates an instance of AjaxSender
 	 * @param {String}					url                   			URL to send the call to
-     * @param {Object}					[parameters]            		Request parameters
-     * @param {String}					[parameters.method=GET]			Request method
-     * @param {Object|FormData}			[parameters.data]				Request data
-     * @param {String}					[parameters.responseType=json]	Request response type
-     * @param {Object.<String, String>}	[parameters.headers]			Request headers
-     * @param {eventCallback}			[parameters.progress]			Callback for the progress event
-     * @param {eventCallback}			[parameters.load]				Callback for the load event
-     * @param {eventCallback}			[parameters.error]				Callback for the error event
-     * @param {eventCallback}			[parameters.uploadProgress]		Callback for the upload progress event
-     * @param {eventCallback}			[parameters.uploadLoad]			Callback for the upload progress event
-     */
-	constructor(url, parameters){
+	 * @param {Object}					[parameters]            		Request parameters
+	 * @param {String}					[parameters.method=GET]			Request method
+	 * @param {Object|FormData}			[parameters.data]				Request data
+	 * @param {String}					[parameters.responseType=json]	Request response type
+	 * @param {Object.<String, String>}	[parameters.headers]			Request headers
+	 * @param {eventCallback}			[parameters.progress]			Callback for the progress event
+	 * @param {eventCallback}			[parameters.load]				Callback for the load event
+	 * @param {eventCallback}			[parameters.error]				Callback for the error event
+	 * @param {eventCallback}			[parameters.uploadProgress]		Callback for the upload progress event
+	 * @param {eventCallback}			[parameters.uploadLoad]			Callback for the upload progress event
+	 */
+	constructor(url, parameters) {
 		/**
 		 * The request corresponding XMLHttpRequest
 		 * @type {XMLHttpRequest}
@@ -55,12 +60,12 @@ class AjaxSender{
 		/**
 		 * Request method
 		 */
-		if(this._parameters.method == 'GET'){
+		if (this._parameters.method == 'GET') {
 			const urlObject = new URL(url);
 
 			urlObject.search += (urlObject.search.length && Object.keys(this._parameters.data).length ? '&' : '') + this._objectToURL(this._parameters.data);
 			this.xhr.open('GET', urlObject.href);
-		}else{
+		} else {
 			this.xhr.open(this._parameters.method, url);
 		}
 
@@ -72,15 +77,15 @@ class AjaxSender{
 		/**
 		 * Data handling
 		 */
-		if(this._parameters.method == 'GET'){
+		if (this._parameters.method == 'GET') {
 			this.xhr.send();
-		}else{
-			if(this._parameters.data instanceof FormData){
+		} else {
+			if (this._parameters.data instanceof FormData) {
 				this._parameters.data.processData = false;
 				this._parameters.data.contentType = false;
 
 				this.xhr.send(this._parameters.data);
-			}else{
+			} else {
 				this.xhr.send(JSON.stringify(this._parameters.data));
 			}
 		}
@@ -90,23 +95,23 @@ class AjaxSender{
 	 * Handle callback attachment
 	 * @private
 	 */
-	_handleCallbacks(){
+	_handleCallbacks() {
 		/**
 		 * DOWNLOAD CALLBACKS
 		 */
-		if(this._parameters.progress){
+		if (this._parameters.progress) {
 			this.xhr.addEventListener('progress', () => {
 				Reflect.apply(this._parameters.progress, null, [this.xhr.response]);
 			});
 		}
-		if(this._parameters.load){
+		if (this._parameters.load) {
 			this.xhr.addEventListener('load', () => {
-				if(this.xhr.status == 200){
+				if (this.xhr.status == 200) {
 					Reflect.apply(this._parameters.load, null, [this.xhr.response]);
-				}else{
-					if(this._parameters.error){
+				} else {
+					if (this._parameters.error) {
 						Reflect.apply(this._parameters.error, null, [this.xhr]);
-					}else{
+					} else {
 						console.log(this.xhr);
 					}
 				}
@@ -121,12 +126,12 @@ class AjaxSender{
 		/**
 		 * UPLOAD CALLBACKS
 		 */
-		if(this._parameters.uploadProgress){
+		if (this._parameters.uploadProgress) {
 			this.xhr.upload.addEventListener('progress', () => {
 				Reflect.apply(this._parameters.uploadProgress, null, [this.xhr.response]);
 			});
 		}
-		if(this._parameters.uploadLoad){
+		if (this._parameters.uploadLoad) {
 			this.xhr.upload.addEventListener('load', () => {
 				Reflect.apply(this._parameters.uploadLoad, null, [this.xhr.response]);
 			});
@@ -144,12 +149,12 @@ class AjaxSender{
 	 * @param {String} prefix Parameter needed for the recursion
 	 * @private
 	 */
-	_objectToURL(object, prefix){
+	_objectToURL(object, prefix) {
 		const str = [];
 
 		for (const p in object) {
 			if (Reflect.ownKeys(object).includes(p)) {
-			const 	k = prefix ? prefix + '[' + p + ']' : p,
+				const k = prefix ? prefix + '[' + p + ']' : p,
 					v = object[p];
 
 				str.push(v !== null && typeof v === 'object' ? this._objectToURL(v, k) : encodeURIComponent(k) + '=' + encodeURIComponent(v));
@@ -163,9 +168,11 @@ class AjaxSender{
 	 * Stops any outgoing request
 	 * @returns {AjaxSender} The current AjaxSender
 	 */
-	stop(){
+	stop() {
 		this.xhr.abort();
 
 		return this;
 	}
 }
+
+if (typeof window === 'undefined') module.exports = AjaxSender;
