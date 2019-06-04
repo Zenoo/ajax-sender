@@ -3,10 +3,9 @@
   "version": "1.0.1",
   "description": "Send AJAX requests easily",
   "main": "AjaxSender.js",
-  "types": "AjaxSender.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "preversion": "webpack && jsdoc . -R README.md -c docs/jsdoc-conf.json && git add * || true"
+    "preversion": "jsdoc . -R README.md -c docs/jsdoc-conf.json && git add * || true"
   },
   "repository": {
     "type": "git",
