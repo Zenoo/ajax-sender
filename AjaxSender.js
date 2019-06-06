@@ -3,6 +3,9 @@
 
 /*eslint-disable */
 if (typeof window === 'undefined') {
+	/**
+	 * NodeJS dependencies
+	 */
 	XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
 }
 /*eslint-enable */
@@ -129,20 +132,31 @@ class AjaxSender {
 		 * UPLOAD CALLBACKS
 		 */
 		if (this._parameters.uploadProgress) {
-			this.xhr.upload.addEventListener('progress', () => {
-				Reflect.apply(this._parameters.uploadProgress, null, [this.xhr.response]);
-			});
+			if(this.xhr.upload){
+				this.xhr.upload.addEventListener('progress', () => {
+					Reflect.apply(this._parameters.uploadProgress, null, [this.xhr.response]);
+				});
+			}else{
+				console.log('Upload callbacks are unavailable in a NodeJS environment.');
+			}
 		}
 		if (this._parameters.uploadLoad) {
-			this.xhr.upload.addEventListener('load', () => {
-				Reflect.apply(this._parameters.uploadLoad, null, [this.xhr.response]);
+			if(this.xhr.upload){
+				this.xhr.upload.addEventListener('load', () => {
+					Reflect.apply(this._parameters.uploadLoad, null, [this.xhr.response]);
+				});
+			}else{
+				console.log('Upload callbacks are unavailable in a NodeJS environment.');
+			}
+		}
+
+		if(this.xhr.upload){
+			this.xhr.upload.addEventListener('error', this._parameters.error ? () => {
+				Reflect.apply(this._parameters.error, null, [this.xhr]);
+			} : () => {
+				console.log(this.xhr);
 			});
 		}
-		this.xhr.upload.addEventListener('error', this._parameters.error ? () => {
-			Reflect.apply(this._parameters.error, null, [this.xhr]);
-		} : () => {
-			console.log(this.xhr);
-		});
 	}
 
 	/**
