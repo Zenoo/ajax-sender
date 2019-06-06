@@ -85,7 +85,7 @@ class AjaxSender {
 		if (this._parameters.method == 'GET') {
 			this.xhr.send();
 		} else {
-			if (this._parameters.data instanceof FormData) {
+			if (typeof window !== 'undefined' && this._parameters.data instanceof FormData) {
 				this._parameters.data.processData = false;
 				this._parameters.data.contentType = false;
 
