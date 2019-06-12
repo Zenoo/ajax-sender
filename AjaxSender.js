@@ -34,8 +34,11 @@ class AjaxSender {
 	 * @param {eventCallback}			[parameters.error]				Callback for the error event
 	 * @param {eventCallback}			[parameters.uploadProgress]		Callback for the upload progress event
 	 * @param {eventCallback}			[parameters.uploadLoad]			Callback for the upload progress event
+	 * @param {Boolean}		         	[parameters.wait]		        Don't send the request right away (enables the use of asPromise)
 	 */
 	constructor(url, parameters) {
+		this.url = url;
+
 		/**
 		 * The request corresponding XMLHttpRequest
 		 * @type {XMLHttpRequest}
@@ -55,49 +58,14 @@ class AjaxSender {
 			uploadLoad: parameters.uploadLoad
 		};
 
-		this._handleCallbacks();
-
-		/**
-		 * Response type
-		 */
-		this.xhr.responseType = this._parameters.responseType;
-
-		/**
-		 * Request method
-		 */
-		if (this._parameters.method == 'GET') {
-			const urlObject = new URL(url);
-
-			urlObject.search += (urlObject.search.length && Object.keys(this._parameters.data).length ? '&' : '') + this._objectToURL(this._parameters.data);
-			this.xhr.open('GET', urlObject.href);
-		} else {
-			this.xhr.open(this._parameters.method, url);
-		}
-
-		/**
-		 * Request headers
-		 */
-		Object.entries(this._parameters.headers).forEach(([header, value]) => this.xhr.setRequestHeader(header, value));
-
-		/**
-		 * Data handling
-		 */
-		if (this._parameters.method == 'GET') {
-			this.xhr.send();
-		} else {
-			if (typeof window !== 'undefined' && this._parameters.data instanceof FormData) {
-				this._parameters.data.processData = false;
-				this._parameters.data.contentType = false;
-
-				this.xhr.send(this._parameters.data);
-			} else {
-				this.xhr.send(JSON.stringify(this._parameters.data));
-			}
+		if(!this._parameters.wait){
+			this.send();
 		}
 	}
 
 	/**
 	 * Handle callback attachment
+	 * @return {Promise} Resolved when data is loaded
 	 * @private
 	 */
 	_handleCallbacks() {
@@ -109,19 +77,25 @@ class AjaxSender {
 				Reflect.apply(this._parameters.progress, null, [this.xhr.response]);
 			});
 		}
-		if (this._parameters.load) {
-			this.xhr.addEventListener('load', () => {
-				if (this.xhr.status == 200) {
-					Reflect.apply(this._parameters.load, null, [this.xhr.response]);
-				} else {
-					if (this._parameters.error) {
-						Reflect.apply(this._parameters.error, null, [this.xhr]);
+		const promise = new Promise((resolve, reject) => {
+			if (this._parameters.load || this._returnPromise) {
+				this.xhr.addEventListener('load', () => {
+					if (this.xhr.status == 200) {
+						resolve(this.xhr.response);
+						if(this._parameters.load) Reflect.apply(this._parameters.load, null, [this.xhr.response]);
 					} else {
-						console.log(this.xhr);
+						if (this._parameters.error) {
+							Reflect.apply(this._parameters.error, null, [this.xhr]);
+						} else {
+							console.log(this.xhr);
+						}
+
+						reject(this.xhr);
 					}
-				}
-			});
-		}
+				});
+			}
+		});
+
 		this.xhr.addEventListener('error', this._parameters.error ? () => {
 			Reflect.apply(this._parameters.error, null, [this.xhr]);
 		} : () => {
@@ -157,6 +131,8 @@ class AjaxSender {
 				console.log(this.xhr);
 			});
 		}
+
+		return promise;
 	}
 
 	/**
@@ -181,6 +157,16 @@ class AjaxSender {
 	}
 
 	/**
+	 * Sets the .send() return type to a Promise
+	 * @returns {AjaxSender} The current AjaxSender
+	 */
+	asPromise() {
+		this._returnPromise = true;
+
+		return this;
+	}
+
+	/**
 	 * Stops any outgoing request
 	 * @returns {AjaxSender} The current AjaxSender
 	 */
@@ -188,6 +174,54 @@ class AjaxSender {
 		this.xhr.abort();
 
 		return this;
+	}
+
+	/**
+	 * Send the request (if wait == true in init)
+	 * @returns {AjaxSender|Promise} The current AjaxSender OR a Promise
+	 */
+	send() {
+		const loadPromise = this._handleCallbacks();
+
+		/**
+		 * Response type
+		 */
+		this.xhr.responseType = this._parameters.responseType;
+
+		/**
+		 * Request method
+		 */
+		if (this._parameters.method == 'GET') {
+			const urlObject = new URL(this.url);
+
+			urlObject.search += (urlObject.search.length && Object.keys(this._parameters.data).length ? '&' : '') + this._objectToURL(this._parameters.data);
+			this.xhr.open('GET', urlObject.href);
+		} else {
+			this.xhr.open(this._parameters.method, this.url);
+		}
+
+		/**
+		 * Request headers
+		 */
+		Object.entries(this._parameters.headers).forEach(([header, value]) => this.xhr.setRequestHeader(header, value));
+
+		/**
+		 * Data handling
+		 */
+		if (this._parameters.method == 'GET') {
+			this.xhr.send();
+		} else {
+			if (typeof window !== 'undefined' && this._parameters.data instanceof FormData) {
+				this._parameters.data.processData = false;
+				this._parameters.data.contentType = false;
+
+				this.xhr.send(this._parameters.data);
+			} else {
+				this.xhr.send(JSON.stringify(this._parameters.data));
+			}
+		}
+
+		return this._returnPromise ? loadPromise : this;
 	}
 }
 
