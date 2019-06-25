@@ -212,7 +212,7 @@ class AjaxSender {
 			this.xhr.send();
 		} else {
 			if (typeof window !== 'undefined' && this._parameters.data instanceof FormData) {
-				if(![...this._parameters.data.entries()].find(e => e instanceof File)){
+				if(![...this._parameters.data.values()].find(e => e instanceof File)){
 					this._parameters.data.processData = false;
 					this._parameters.data.contentType = false;
 				}
