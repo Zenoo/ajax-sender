@@ -13,16 +13,22 @@ Simply import AjaxSender into your HTML.
 * **How to use**
 
 Create a new [`AjaxSender`](https://zenoo.github.io/ajax-sender/AjaxSender.html) object with the URL as the first parameter :
-```
+```js
 let ajax = new AjaxSender('https://your.url', options);
+// OR using await
+let data = await new AjaxSender('https://your.url', {
+	...,
+	wait: true
+}).asPromise().send();
 ```
 * **Options**
 
-```
+```js
 {
 	method: 'GET',
 	data: { ... },
 	responseType: 'json',
+	wait: false, // Wait before sending the request ?
 	headers: { ... },
 	progress: response => { ... },
 	load: response => { ... },
