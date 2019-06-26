@@ -8,7 +8,7 @@ Send AJAX requests easily
 
 Simply import AjaxSender into your HTML.
 ```
-<script src="https://gitcdn.link/repo/Zenoo/ajax-sender/master/AjaxSender.min.js"></script>	
+<script src="https://unpkg.com/ajax-sender@1.2.1/AjaxSender.min.js"></script>	
 ```
 * **How to use**
 
